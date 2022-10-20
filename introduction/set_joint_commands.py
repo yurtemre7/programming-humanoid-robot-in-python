@@ -19,11 +19,10 @@ from spark_agent import SparkAgent
 
 class MyAgent(SparkAgent):
     def think(self, perception):
-        action = super(MyAgent, self).think(perception)
         # YOUR CODE HERE
 
-        return action
+        return super(MyAgent, self).think(perception)
 
-if '__main__' == __name__:
+if __name__ == '__main__':
     agent = MyAgent()
     agent.run()

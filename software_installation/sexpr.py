@@ -133,13 +133,11 @@ class SExprReader(AbstractFilter):
                     # beginning a new list.
                     self.build_stack.append(self.build)
                     empty = []
-                    if self.build is None:
-                        # begin from a scratch.
-                        self.build = empty
-                    else:
+                    if self.build is not None:
                         # begin from the end of the current list.
                         self.build.append(empty)
-                        self.build = empty
+                    # begin from a scratch.
+                    self.build = empty
                 elif c in self.paren_end:
                     # terminating the current list
                     if self.build is None:
@@ -160,10 +158,7 @@ class SExprReader(AbstractFilter):
             if self.sym:
                 self.build.append(self.sym)
                 self.sym = ''
-            if len(self.build_stack) == 1:
-                x = self.build
-            else:
-                x = self.build_stack[1]
+            x = self.build if len(self.build_stack) == 1 else self.build_stack[1]
             self.build = None
             self.build_stack = []
             self.premature_eof(len(self.build_stack), x)
@@ -229,6 +224,4 @@ def str2sexpr_strict(s):
 ##
 def sexpr2str(e):
     """convert a sexpr into Lisp-like representation."""
-    if not isinstance(e, list):
-        return e
-    return "(" + " ".join(map(sexpr2str, e)) + ")"
+    return "(" + " ".join(map(sexpr2str, e)) + ")" if isinstance(e, list) else e

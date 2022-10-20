@@ -40,10 +40,9 @@ class AngleInterpolationAgent(PIDAgent):
         return super(AngleInterpolationAgent, self).think(perception)
 
     def angle_interpolation(self, keyframes, perception):
-        target_joints = {}
         # YOUR CODE HERE
 
-        return target_joints
+        return {}
 
 if __name__ == '__main__':
     agent = AngleInterpolationAgent()

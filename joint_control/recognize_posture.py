@@ -29,10 +29,9 @@ class PostureRecognitionAgent(AngleInterpolationAgent):
         return super(PostureRecognitionAgent, self).think(perception)
 
     def recognize_posture(self, perception):
-        posture = 'unknown'
         # YOUR CODE HERE
 
-        return posture
+        return 'unknown'
 
 if __name__ == '__main__':
     agent = PostureRecognitionAgent()

@@ -52,10 +52,9 @@ class ForwardKinematicsAgent(PostureRecognitionAgent):
         :return: transformation
         :rtype: 4x4 matrix
         '''
-        T = identity(4)
         # YOUR CODE HERE
 
-        return T
+        return identity(4)
 
     def forward_kinematics(self, joints):
         '''forward kinematics

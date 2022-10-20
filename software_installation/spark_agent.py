@@ -146,15 +146,13 @@ class Perception:
             elif name == ACCELEROMETER_PERCEPTOR:
                 self.acc = [float(v) for v in s[2][1:]]
             elif name == HINGE_JOINT_PERCEPTOR:
-                jointv = {}
-                for i in s[1:]:
-                    jointv[i[0]] = i[1]
+                jointv = {i[0]: i[1] for i in s[1:]}
                 name = JOINT_SENSOR_NAMES[jointv['n']]
                 if 'ax' in jointv:
                     self.joint[name] = float(jointv['ax']) * DEG_TO_RAD * (-1 if name in INVERSED_JOINTS else 1)
                 if 'tp' in jointv:
                     self.joint_temperature[name] = float(jointv['tp'])
-            elif name == VISION_PERCEPTOR or name == TOP_CAMERA:
+            elif name in [VISION_PERCEPTOR, TOP_CAMERA]:
                 self.see[0] = self._parse_vision(s[1:])
             elif name == BOTTOM_CAMERA:
                 self.see[1] = self._parse_vision(s[1:])
@@ -168,7 +166,7 @@ class Perception:
             elif name == SONAR_PERCEPTOR:
                 self.us[s[1]] = [float(dist) for dist in s[2]]
             else:
-                raise RuntimeError('unknown perception: ' + str(s))
+                raise RuntimeError(f'unknown perception: {str(s)}')
 
         if 'torso' in self.gps:
             data = self.gps['torso']
@@ -183,12 +181,9 @@ class Perception:
             self.imu = [angX, angY]
 
     def _parse_vision(self, sexp):
-        see = {}
-        see[VISION_PERCEPTOR_LINE] = []
-        see[VISION_PERCEPTOR_AGENT] = []
-
+        see = {VISION_PERCEPTOR_LINE: [], VISION_PERCEPTOR_AGENT: []}
         for i in sexp:
-            if i[0] == VISION_PERCEPTOR_LINE or i[0] == VISION_PERCEPTOR_AGENT:
+            if i[0] in [VISION_PERCEPTOR_LINE, VISION_PERCEPTOR_AGENT]:
                 see[i[0]].append(i[1:])
             else:
                 see[i[0]] = i[1:]
@@ -219,7 +214,7 @@ class SparkAgent(object):
 
         self.send_command('(scene rsg/agent/naov4/nao.rsg)')
         self.sense()  # only need to get msg from simspark
-        init_cmd = ('(init (unum ' + str(player_id) + ')(teamname ' + teamname + '))')
+        init_cmd = f'(init (unum {str(player_id)})(teamname {teamname}))'
         self.send_command(init_cmd)
         self.thread = None
 
@@ -256,8 +251,7 @@ class SparkAgent(object):
         return self.perception
 
     def think(self, perception):
-        action = Action()
-        return action
+        return Action()
 
     def sense_think_act(self):
         perception = self.sense()
@@ -275,6 +269,6 @@ class SparkAgent(object):
             self.thread.start()
 
 
-if '__main__' == __name__:
+if __name__ == '__main__':
     agent = SparkAgent()
     agent.run()

@@ -22,9 +22,8 @@ class InverseKinematicsAgent(ForwardKinematicsAgent):
         :param transform: 4x4 transform matrix
         :return: list of joint angles
         '''
-        joint_angles = []
         # YOUR CODE HERE
-        return joint_angles
+        return []
 
     def set_transforms(self, effector_name, transform):
         '''solve the inverse kinematics and control joints use the results

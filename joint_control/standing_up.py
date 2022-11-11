@@ -7,6 +7,7 @@
 
 
 from recognize_posture import PostureRecognitionAgent
+from keyframes import *
 
 
 class StandingUpAgent(PostureRecognitionAgent):
@@ -17,7 +18,13 @@ class StandingUpAgent(PostureRecognitionAgent):
     def standing_up(self):
         posture = self.posture
         # YOUR CODE HERE
-
+        print(posture)
+        if posture in ["Back", "Left"]:
+            self.keyframes = leftBackToStand()
+        elif posture == "Belly":
+            self.keyframes = leftBellyToStand()
+        elif posture == "Right":
+            self.keyframes = rightBackToStand()
 
 class TestStandingUpAgent(StandingUpAgent):
     '''this agent turns off all motor to falls down in fixed cycles
@@ -41,6 +48,7 @@ class TestStandingUpAgent(StandingUpAgent):
             action.stiffness = {j: 1 for j in self.joint_names}  # turn on joints
         if time_now - self.stiffness_on_off_time > self.stiffness_on_cycle + self.stiffness_off_cycle:
             self.stiffness_on_off_time = time_now
+            self.begin = None
 
         return action
 

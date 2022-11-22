@@ -91,12 +91,12 @@ class InverseKinematicsAgent(ForwardKinematicsAgent):
         # joint_angles = []
         # YOUR CODE HERE
 
-        def from_trans(matrix):
+        def from_transformation_column(matrix):
             return [
-                matrix[0, -1],
-                matrix[1, -1],
-                matrix[2, -1],
-                atan2(matrix[1, 0], matrix[0, 0]),
+                matrix[-1, 0],
+                matrix[-1, 1],
+                matrix[-1, 2],
+                atan2(matrix[2, 1], matrix[2, 2]),
             ]
 
         l = 0.1  # lambda
@@ -114,20 +114,20 @@ class InverseKinematicsAgent(ForwardKinematicsAgent):
             if joint not in joint_angles:
                 joint_angles[joint] = 0
 
-        target = from_trans(transform)
+        target = from_transformation_column(transform)
         for i in range(steps):
             # do fk
             self.forward_kinematics(joint_angles)
 
             # get values of the joints after fk
             Ts = list(self.transforms.values())
-            Te = matrix([from_trans(Ts[-1])]).T
+            Te = matrix([from_transformation_column(Ts[-1])]).T
             # calculate error
             e = target - Te
             e[e > max_step] = max_step
             e[e < -max_step] = -max_step
             # calculate jacobian
-            T = matrix([from_trans(i) for i in Ts[1:-1]]).T
+            T = matrix([from_transformation_column(i) for i in Ts[1:-1]]).T
             J = Te - T
             dT = Te - T
 
@@ -135,7 +135,7 @@ class InverseKinematicsAgent(ForwardKinematicsAgent):
             J[1, :] = dT[0, :]
             J[-1, :] = 1
 
-            d_theta = l * pinv(J) * e
+            d_theta = l * pinv(J).dot(e)
 
             for i, joint in enumerate(self.chains[effector_name]):
                 joint_angles[joint] += np.asarray(d_theta.T)[0][i]
@@ -150,7 +150,7 @@ class InverseKinematicsAgent(ForwardKinematicsAgent):
         # YOUR CODE HERE
         joint_angles = self.inverse_kinematics(effector_name, transform)
         names = self.chains[effector_name]
-        times = [[1.0, 2.0]] * len(names)
+        times = [[2.0, 6.0]] * len(names)
         keys = [
             [
                 [self.perception.joint[name], [3, 0, 0], [3, 0, 0]],
@@ -167,10 +167,10 @@ if __name__ == "__main__":
     # test inverse kinematics
     T = identity(4)
 
-    T[0,-1] = 1
-    T[1,-1] = 1
-    T[2,-1] = 1
+    T[3, 0] = -1
+    T[3, 1] = 1
+    T[3, 2] = -1
 
-    agent.set_transforms('LArm', T)
+    agent.set_transforms('LLeg', T)
 
     agent.run()

@@ -127,12 +127,13 @@ class InverseKinematicsAgent(ForwardKinematicsAgent):
             e[e > max_step] = max_step
             e[e < -max_step] = -max_step
             # calculate jacobian
-            T = matrix([from_transformation_column(i) for i in Ts[1:-1]]).T
+            T = matrix([from_transformation_column(i) for i in Ts[:-1]]).T
             J = Te - T
             dT = Te - T
 
-            J[0, :] = -dT[1, :]
-            J[1, :] = dT[0, :]
+            J[0, :] = dT[2, :]
+            J[1, :] = dT[1, :]
+            J[2, :] = dT[0, :]
             J[-1, :] = 1
 
             d_theta = l * pinv(J).dot(e)
@@ -168,9 +169,10 @@ if __name__ == "__main__":
     T = identity(4)
 
     T[3, 0] = -1
-    T[3, 1] = 1
-    T[3, 2] = -1
+    T[3, 1] = -1
+    T[3, 2] = 1
 
+    agent.set_transforms('RArm', T)
     agent.set_transforms('LLeg', T)
 
     agent.run()
